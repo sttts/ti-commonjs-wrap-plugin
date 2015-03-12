@@ -21,7 +21,7 @@ exports.init = function (logger, config, cli, appc) {
 			if (!/ti\-commonjs\.js$/.test(file) && /\.js$/.test(file)) {
 				var stats = fs.lstatSync(fullpath);
 				if (stats.isFile() || (stats.isSymbolicLink() && fs.lstatSync(fs.readlinkSync(fullpath)).isFile())) {
-					logger.info('Wrapping ' + file + '...');
+					logger.debug('Wrapping ' + file + '...');
 					wrapFile(file, fullpath, platform);
 				}
 			}
