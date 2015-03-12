@@ -1,6 +1,6 @@
 # ti-commonjs-wrap-plugin
 
-The module [ti-commonjs](https://github.com/tonylukasavage/ti-commonjs) allows to use NodeJS style modules in Allow. This plugin for the Titanium CLI adds support for stock Titanium SDK code.
+The module [ti-commonjs](https://github.com/tonylukasavage/ti-commonjs) allows to use NodeJS style modules in Alloy. This plugin for the Titanium CLI adds support for stock Titanium SDK code.
 
 ## How to install
 
