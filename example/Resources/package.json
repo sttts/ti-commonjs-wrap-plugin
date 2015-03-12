@@ -1,0 +1,9 @@
+{
+	"name": "ti-commonjs-wrap-example",
+	"description": "ti-commonjs-wrap-plugin test app",
+	"repository": "git@github.com/sttts/ti-commonjs-wrap-plugin",
+  	"dependencies": {
+    	"ti-commonjs": "0.0.1",
+    	"ti-mocha": "^0.2.0"
+  	}
+}

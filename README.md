@@ -4,23 +4,41 @@ The module [ti-commonjs](https://github.com/tonylukasavage/ti-commonjs) allows t
 
 ## How to install
 
-Check out the module and place it at:
+Check out the module and place it at
 
 ```
-plugins/1.0/ti-commonjs-wrap-plugin
+plugins/ti-commonjs-wrap-plugin
 ```
 
 inside of your Titanium project.
 
 Install the required npm packages:
 
+```bash
+$ cd plugins/ti-commonjs-wrap-plugin
+$ npm install
 ```
-npm install
+
+Add the plugin to your `tiapp.xml`:
+
+```xml
+<plugins>
+    <plugin version="1.0">ti-commonjs-wrap-plugin</plugin>
+</plugins>
 ```
 
 ## How to build the example
 
-```
-cd example
-ti build -p ios
+```bash
+$ cd example
+$ cd Resources
+$ npm install
+$ cd ..
+$ ti build -p ios
+...
+[DEBUG] Application booted in 123.372018 ms
+  mocha
+    + works
+
+  1 passing (6ms)
 ```

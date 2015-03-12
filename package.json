@@ -1,0 +1,24 @@
+{
+	"name": "ti-commonjs-wrap-plugin",
+	"title": "Wrap js files for ti-commonjs on stock Titanium SDK",
+	"description": "Adds a clusure with a local 'require' around every js file for ti-commonjs support",
+	"keywords": [
+		"titanium",
+		"commonjs",
+		"nodejs",
+		"ti-commonjs"
+	],
+	"version": "1.0.0",
+	"author": "Dr. Stefan Schimanski",
+	"maintainers": [
+		"Dr. Stefan Schimanski <stefan.schimanski@gmail.com>"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/sttts/ti-commonjs-wrap-plugin"
+	},
+	"license": "GPL",
+	"dependencies": {
+	    "wrench": "*"
+	}
+}
