@@ -12,12 +12,13 @@ exports.init = function (logger, config, cli, appc) {
 			fs = require('fs'),
 			path = require('path');
 
-		logger.info('Search js files to wrap in ' + build.buildDir);
-		var files = wrench.readdirSyncRecursive(build.buildDir);
+		var appDir = build.xcodeAppDir;
+		logger.info('Search js files to wrap in ' + appDir);
+		var files = wrench.readdirSyncRecursive(appDir);
 		var platform = cli.argv.platform;
 
 		files.forEach(function(file) {
-			var fullpath = path.join(build.buildDir, file);
+			var fullpath = path.join(appDir, file);
 			if (!/ti\-commonjs\.js$/.test(file) && /\.js$/.test(file)) {
 				var stats = fs.lstatSync(fullpath);
 				if (stats.isFile() || (stats.isSymbolicLink() && fs.lstatSync(fs.readlinkSync(fullpath)).isFile())) {
