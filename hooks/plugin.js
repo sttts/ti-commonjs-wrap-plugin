@@ -1,4 +1,4 @@
-console.log("Running com.sttts.ti-commonjs-wrap...");
+console.log("Running ti-commonjs-wrap-plugin...");
 
 exports.cliVersion = '>=3.X';
 
