@@ -27,6 +27,10 @@ Add the plugin to your `tiapp.xml`:
 </plugins>
 ```
 
+## How to control what to wrap
+
+The plugin supports a [.gitignore](http://git-scm.com/docs/gitignore) like file named `.commonjswrapignore` in the project root directory. Files matching the patterns in this file are not wrapped, i.e. the `require` command in those files is the original Titanium `require`.
+
 ## How to build the example
 
 ```bash

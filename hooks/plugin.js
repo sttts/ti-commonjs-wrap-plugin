@@ -6,25 +6,66 @@ String.prototype.endsWith = function (s) {
   return this.length >= s.length && this.substr(this.length - s.length) == s;
 }
 
-exports.init = function (logger, config, cli, appc) {
-    cli.on("build.post.compile", function (build, finished) {
-		var wrench = require('wrench'),
-			fs = require('fs'),
-			path = require('path');
+String.prototype.beginsWith = function (s) {
+  return this.substr(0, s.length) == s;
+}
 
+String.prototype.withoutPrefix = function (s) {
+  return this.substr(s.length);
+}
+
+var projectDir = null;
+
+exports.init = function (logger, config, cli, appc) {
+	var fs = require('fs'),
+		path = require('path'),
+		ignore = require('ignore');
+	var commonjs_wrap_ignore_passing = ignore().addIgnoreFile(
+		ignore.select([
+			'.commonjswrapignore'
+		])
+	).createFilter();
+
+	var files_to_wrap = [];
+
+	cli.on("build.pre.compile", function (build, finished) {
+		projectDir = build.projectDir;
+		finished();
+	});
+
+	cli.on("build.ios.copyResource", {
+		pre: function (build, finished) {
+			var source_file = build.args[0];
+			var relative_source_file = source_file.withoutPrefix(projectDir + '/');
+
+			process.nextTick(function() {
+				if (!/ti\-commonjs\.js$/.test(source_file) && /\.js$/.test(source_file) &&
+						relative_source_file.beginsWith('Resources/') &&
+						commonjs_wrap_ignore_passing(source_file)) {
+					files_to_wrap.push(relative_source_file.withoutPrefix('Resources/'));
+				}
+
+				if (/\.commonjswrapignore$/.test(source_file)) {
+					// skip the .commonjswrapignore files
+					build.fn = null;
+					finished(null, build);
+				} else {
+					finished();
+				}
+			});
+		}
+	});
+
+	cli.on("build.post.compile", function (build, finished) {
 		var appDir = build.xcodeAppDir;
-		logger.info('Search js files to wrap in ' + appDir);
-		var files = wrench.readdirSyncRecursive(appDir);
 		var platform = cli.argv.platform;
 
-		files.forEach(function(file) {
+		files_to_wrap.forEach(function(file) {
 			var fullpath = path.join(appDir, file);
-			if (!/ti\-commonjs\.js$/.test(file) && /\.js$/.test(file)) {
-				var stats = fs.lstatSync(fullpath);
-				if (stats.isFile() || (stats.isSymbolicLink() && fs.lstatSync(fs.readlinkSync(fullpath)).isFile())) {
-					logger.debug('Wrapping ' + file + '...');
-					wrapFile(file, fullpath, platform);
-				}
+			var stats = fs.lstatSync(fullpath);
+			if (stats.isFile() || (stats.isSymbolicLink() && fs.lstatSync(fs.readlinkSync(fullpath)).isFile())) {
+				logger.debug('Wrapping ' + file + '...');
+				wrapFile(file, fullpath, platform);
 			}
 		});
 
