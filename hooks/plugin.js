@@ -83,7 +83,7 @@ function wrapFile(file, fullpath, platform) {
 		path = require('path');
 
 	var filename = '/' + file,
-		wrapperBase = '(function(tirequire,__dirname,__filename){',
+		wrapperBase = '(function(tirequire,__dirname,__filename,__ticommon_dir){',
 		content = fs.readFileSync(fullpath, 'utf8'),
 		code = wrapperBase;
 
@@ -104,7 +104,7 @@ function wrapFile(file, fullpath, platform) {
 
 	code += 'module.loaded=false;';
 	code += 'module.filename=__filename;';
-	code += 'var require=tirequire("node_modules/ti-commonjs/lib/ti-commonjs")(__dirname,module);';
+	code += 'var require=tirequire(__ticommon_dir+"/ti-commonjs/lib/ti-commonjs")(__dirname,module);';
 
 	if (platform === 'android') {
 		// doesn't support overriding module.require
@@ -118,7 +118,7 @@ function wrapFile(file, fullpath, platform) {
 	// via tirequire(). This should eventually be handled in Alloy itself.
 	code += content.replace(/require\((['"])alloy/g, 'tirequire($1alloy');
 
-	code += '\nmodule.loaded=true;})(require,"' + path.dirname(filename) + '","' + filename + '");';
+	code += '\nmodule.loaded=true;})(require,"' + path.dirname(filename) + '","' + filename + '",(typeof(ti_commonjs_dir)=="undefined")?"node_modules":ti_commonjs_dir);';
 	fs.unlinkSync(fullpath);
 	fs.writeFileSync(fullpath, code);
 }
