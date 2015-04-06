@@ -63,8 +63,8 @@ exports.init = function (logger, config, cli, appc) {
 		files_to_wrap.forEach(function(file) {
 			var fullpath = path.join(appDir, file);
 			try {
-				var stats = fs.lstatSync(fullpath);
-				if (stats.isFile() || (stats.isSymbolicLink() && fs.lstatSync(fs.readlinkSync(fullpath)).isFile())) {
+				var stats = fs.statSync(fullpath);
+				if (stats.isFile()) {
 					logger.debug('Wrapping ' + file + '...');
 					wrapFile(file, fullpath, platform);
 				}
