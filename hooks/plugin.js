@@ -25,26 +25,18 @@ exports.init = function (logger, config, cli, appc) {
 			'.commonjswrapignore'
 		])
 	).createFilter();
-
-	var files_to_wrap = [];
+	var ios = cli.argv.platform === 'iphone';
 
 	cli.on("build.pre.compile", function (build, finished) {
 		projectDir = build.projectDir;
 		finished();
 	});
 
-	cli.on("build.ios.copyResource", {
+	var pre_hook = {
 		pre: function (build, finished) {
 			var source_file = build.args[0];
-			var relative_source_file = source_file.withoutPrefix(projectDir + '/');
 
 			process.nextTick(function() {
-				if (!/ti\-commonjs\.js$/.test(source_file) && /\.js$/.test(source_file) &&
-						relative_source_file.beginsWith('Resources/') &&
-						commonjs_wrap_ignore_passing(source_file)) {
-					files_to_wrap.push(relative_source_file.withoutPrefix('Resources/'));
-				}
-
 				if (/\.commonjswrapignore$/.test(source_file)) {
 					// skip the .commonjswrapignore files
 					build.fn = null;
@@ -53,29 +45,38 @@ exports.init = function (logger, config, cli, appc) {
 					finished();
 				}
 			});
-		}
-	});
+		},
+		post: function (build, finished) {
+			var source_file = build.args[0];
+			var relative_source_file = source_file.withoutPrefix(projectDir + '/');
+			var self = this;
 
-	cli.on("build.post.compile", function (build, finished) {
-		var appDir = build.xcodeAppDir;
-		var platform = cli.argv.platform;
+			process.nextTick(function() {
+				if (!/ti\-commonjs\.js$/.test(source_file) && /\.js$/.test(source_file) &&
+						relative_source_file.beginsWith('Resources/') &&
+						commonjs_wrap_ignore_passing(source_file)) {
 
-		files_to_wrap.forEach(function(file) {
-			var fullpath = path.join(appDir, file);
-			try {
-				var stats = fs.statSync(fullpath);
-				if (stats.isFile()) {
-					logger.debug('Wrapping ' + file + '...');
-					wrapFile(file, fullpath, platform);
+					var baseFile = relative_source_file.withoutPrefix('Resources/');
+					var baseDir = ios ? self.xcodeAppDir : self.buildBinAssetsResourcesDir;
+					var fullpath = path.join(baseDir, baseFile);
+					try {
+						var stats = fs.statSync(fullpath);
+						if (stats.isFile()) {
+							logger.debug('Wrapping ' + baseFile + '...');
+							wrapFile(baseFile, fullpath, cli.argv.platform);
+						}
+					}
+					catch (e) {
+						// ignore
+					}
 				}
-			}
-			catch (e) {
-				// ignore
-			}
-		});
 
-		finished();
-	});
+				finished();
+			});
+		}
+	};
+	cli.on("build.ios.copyResource", pre_hook);
+	cli.on("build.android.copyResource", pre_hook);
 };
 
 function wrapFile(file, fullpath, platform) {
